@@ -18,7 +18,7 @@ This Python script replicates the behavior of  provides functionality to count t
 To make this script easily accessible from the command line, you can download it and place it in `/usr/local/bin`:
 
 1. Download the script:
-```curl https://raw.githubusercontent.com/mariof89/coding-challenges/master/wc-tool/ccwc.py -o ccwc.py```
+```curl https://raw.githubusercontent.com/emme-f/coding-challenges/master/wc-tool/ccwc.py -o ccwc.py```
 
 2. Make the script executable:
 ```chmod +x ccwc.py```

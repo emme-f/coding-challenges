@@ -1,63 +1,65 @@
 #!/usr/bin/env python3
 
 import argparse
-import os
-import re
+import sys
 
 
-def count_bytes(filename):
-    return os.path.getsize(filename)
+def count_bytes(text):
+    return len(text.encode('utf-8'))
 
-def count_lines(filename):
-    return sum(1 for _ in open(filename))
+def count_lines(text):
+    return len(text.splitlines())
+    
+def count_words(text):
+    return sum(len(row.split())for row in text.splitlines())
 
-def count_words(filename):
-    return sum(len(row.split())for row in open(filename))
-
-def count_chars(filename):
-    with open(filename, 'r') as file:
-        chars = 0
-        for line in file.readlines():
-            chars += len(line)
-        return chars
-        
-        return len(adjusted_text)
-    return f"{sum(len(row)for row in open(filename))} {filename}"
+def count_chars(text):
+    return len(text)
  
 def main():
-    parser = argparse.ArgumentParser(description='Process some files')
+    parser = argparse.ArgumentParser(description='Counting bytes, lines, words, characters of any text file')
 
-    #group = parser.add_mutually_exclusive_group(required=True)
     parser.add_argument('-c', '--bytes', action='store_true', help='Action to perform: -c for getting the size in bytes')
     parser.add_argument('-l', '--lines', action='store_true', help='Action to perform: -l for counting the num of rows in file')
-    parser.add_argument('-w', '--words', action='store_true', help='Action to perform: -l for counting the num of rows in file')
-    parser.add_argument('-m', '--chars', action='store_true', help='Action to perform: -l for counting the num of rows in file')
+    parser.add_argument('-w', '--words', action='store_true', help='Action to perform: -w for counting the num of words in file')
+    parser.add_argument('-m', '--chars', action='store_true', help='Action to perform: -m for counting the num of characters in file')
 
-    #group.add_argument('action', choices=['-t', '--truncate'], help='Action to perform: -c for countg word')
-    
-    parser.add_argument('filename', help='The name of the file to process')
+    parser.add_argument('filename', nargs='?', default=None, help='The name of the file to process')
     
     args = parser.parse_args()
 
+    if args.filename:
+        text = open(args.filename, 'rb').read().decode()
+    elif not sys.stdin.isatty():
+        text = sys.stdin.read()
+    else:
+        parser.print_help()
+        sys.exit(1)
+
     if args.bytes:
-        size_file_bytes = count_bytes(filename=args.filename)
-        res_str = f"{size_file_bytes} {args.filename}"
+        size_file_bytes = count_bytes(text=text)
+        res_str = f"{size_file_bytes}"
     if args.lines:
-        num_lines = count_lines(filename=args.filename)
-        res_str = f"{num_lines} {args.filename}"
+        num_lines = count_lines(text=text)
+        res_str = f"{num_lines}"
     if args.words:
-        num_words = count_words(filename=args.filename)
-        res_str = f"{num_words} {args.filename}"
+        num_words = count_words(text=text)
+        res_str = f"{num_words}"
     if args.chars:
-        num_chars = count_chars(filename=args.filename)
-        res_str = f"{num_chars} {args.filename}"
+        num_chars = count_chars(text=text)
+        res_str = f"{num_chars}"
+    
     if not args.bytes and not args.lines and not args.words and not args.chars:
         result = sorted([
             count_lines(filename=args.filename),
             count_bytes(filename=args.filename),
             count_words(filename=args.filename)
         ])
-        res_str = f"{' '.join(map(str, result))} {args.filename}" 
+        res_str = f"{' '.join(map(str, result))}"
+    
+    if args.filename:
+        res_str += f' {args.filename}'
     print(f"{' '*4}{res_str}")
+
 if __name__ == "__main__":
     main()
